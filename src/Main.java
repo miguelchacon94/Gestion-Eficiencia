@@ -2,12 +2,17 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-
+/**
+ * Código destinado al estudio de la eficiencia de algoritmo de busqueda y ordenación
+ * @author Miguel Chacon Carrasco
+ * @version 1.0
+ *
+ */
 public class Main {
 	/**
-	 * 
+	 * Funcion para escribir ciertos datos en un archivo con un nombre dado
 	 * @param datos
-	 * @param n
+	 * @param nombre
 	 */
 	public static void aniadirArchivo(long[] datos, String nombre) {
 		FileWriter flwriter = null;
@@ -27,7 +32,7 @@ public class Main {
 	}
 	
 	/**
-	 * 
+	 * Funcion para la busqueda de un dato concreto en un array de datos
 	 * @param datos
 	 * @param dato
 	 * @return
@@ -70,7 +75,7 @@ public class Main {
 	}
 	
 	/**
-	 * 
+	 * Funcion de ordenación mediante el método quicksort
 	 * @param A
 	 * @param izq
 	 * @param der
@@ -100,7 +105,7 @@ public class Main {
 		}
 	
 	/**
-	 * Metodo deordenacion por 
+	 * Metodo de ordenacion por el metodo de mergesort
 	 * Inicialmente izq sera cero y der el tamaño del array menos uno
 	 * @param A
 	 * @param izq posicion donde iniciamos la ordenacion
@@ -145,8 +150,14 @@ public class Main {
 	
 	public static void main(String[] args) throws IOException {
 		int m=500;//numero de mediciones que hace
-		int n=20000;//tamaño de los arrays
+		int n=15000;//tamaño de los arrays
 		int o=100000;
+		long dataSize = 1024 * 1024;
+		Runtime runtime = Runtime.getRuntime();
+		long[] memoria1 = new long[m];
+		long[] memoria2 = new long[m];
+		long[] memoria3 = new long[m];
+		long[] memoria4 = new long[m];
 		long[] Diferencia1 =new long[m];
 		long[] Diferencia2 =new long[m];
 		long[] Diferencia3 =new long[m];
@@ -168,9 +179,12 @@ public class Main {
 		time_start = System.nanoTime();
 		
 		mergesort(A, 0, A.length-1);
+		memoria1[j]=(runtime.totalMemory() - runtime.freeMemory()) / dataSize;
 		time_end = System.nanoTime();
 		time_start2 = System.nanoTime();
+		
 		quicksort( B, 0, B.length-1);
+		memoria2[j]=(runtime.totalMemory() - runtime.freeMemory()) / dataSize;
 		time_end2 = System.nanoTime();
 		//System.out.println("the task has taken "+ ( time_end - time_start ) +" milliseconds");
 		dif1=time_end - time_start;
@@ -182,25 +196,30 @@ public class Main {
 		
 		time_start3 = System.nanoTime();
 		int a = busquedaBinaria(A, (int) (Math.random()*o));
+		memoria3[j]=(runtime.totalMemory() - runtime.freeMemory()) / dataSize;
 		time_end3 = System.nanoTime();
 		Diferencia3[j]=time_end3-time_start3;
 		
 		time_start4 = System.nanoTime();
 		int b=busquedaSecuencial(B, (int) (Math.random()*o) );
+		memoria4[j]=(runtime.totalMemory() - runtime.freeMemory()) / dataSize;
 		time_end4 = System.nanoTime();
 		Diferencia4[j]=time_end4-time_start4;
 		
-		
+		//System.out.println(memoria1[j]);
 		//System.out.println("the mergesort has taken "+ ( time_end - time_start ) +" milliseconds");
 		//System.out.println("the quicksort has taken "+ ( time_end2 - time_start2 ) +" nanoseconds");
 		//System.out.println("the busqueda binaria has taken "+ ( time_end3 - time_start3 ) +" nanoseconds");
 		//System.out.println("the Busqueda secuencial has taken "+ ( time_end4 - time_start4 ) +" nanoseconds");
 		}
-		aniadirArchivo(Diferencia1, "mergesort");
-		aniadirArchivo(Diferencia2, "quicksort");
-		aniadirArchivo(Diferencia3, "Busqueda_Binaria");
-		aniadirArchivo(Diferencia4, "Busqueda_Secuencial");
-		
+		aniadirArchivo(Diferencia1, "Tiempo_mergesort_"+n);
+		aniadirArchivo(Diferencia2, "Tiempo_quicksort_"+n);
+		aniadirArchivo(Diferencia3, "Tiempo_Busqueda_Binaria_"+n);
+		aniadirArchivo(Diferencia4, "Tiempo_Busqueda_Secuencial_"+n);
+		aniadirArchivo(memoria1,"Memoria_mergesort_"+n);
+		aniadirArchivo(memoria2,"Memoria_quicksort_"+n);
+		aniadirArchivo(memoria3,"Memoria_Busqueda_Binaria_"+n);
+		aniadirArchivo(memoria4,"Memoria_Busqueda_Secuencial_"+n);
 		
 	}
 
