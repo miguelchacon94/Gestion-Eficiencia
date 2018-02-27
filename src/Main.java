@@ -150,7 +150,7 @@ public class Main {
 	
 	public static void main(String[] args) throws IOException {
 		int m=500;//numero de mediciones que hace
-		int n=15000;//tamaño de los arrays
+		int n=70000;//tamaño de los arrays
 		int o=100000;
 		long dataSize = 1024 * 1024;
 		Runtime runtime = Runtime.getRuntime();
