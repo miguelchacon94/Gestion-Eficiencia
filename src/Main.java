@@ -8,12 +8,14 @@ import java.io.IOException;
  * @version 1.0
  *
  */
+
 public class Main {
 	/**
 	 * Funcion para escribir ciertos datos en un archivo con un nombre dado
 	 * @param datos
 	 * @param nombre
 	 */
+	
 	public static void aniadirArchivo(long[] datos, String nombre) {
 		FileWriter flwriter = null;
 		try {//además de la ruta del archivo recibe un parámetro de tipo boolean, que le indican que se va añadir más registros 
@@ -37,7 +39,7 @@ public class Main {
 	 * @param dato
 	 * @return
 	 */
-	public static int busquedaBinaria( int [] datos, int dato) {
+	public static int busquedaBinaria( int [] datos, int dato, int j) {
 		 int inicio = 0;
 		 int fin = datos.length - 1;
 		 int pos;
@@ -51,6 +53,7 @@ public class Main {
 		  fin = pos-1;
 		     }
 		 }
+		 memoria3[j]=(runtime.totalMemory() - runtime.freeMemory()) / dataSize;
 		 return -1;
 	  }
 		/**
@@ -59,9 +62,10 @@ public class Main {
 		 * @param dato
 		 * @return
 		 */
-	public static int busquedaSecuencial(int [] datos, int dato){
+	public static int busquedaSecuencial(int [] datos, int dato, int j){
 		int inicio = 0;
 		 int fin = datos.length - 1;
+		 
 		 int pos=-1;
 		 for (int i = 0; i<datos.length;i++){
 			 if (dato==datos[i]){
@@ -69,7 +73,7 @@ public class Main {
 			 }
 		 }
 		 
-		 
+		 memoria4[j]=(runtime.totalMemory() - runtime.freeMemory()) / dataSize;
 		 
 		 return pos;
 	}
@@ -80,13 +84,13 @@ public class Main {
 	 * @param izq
 	 * @param der
 	 */
-	public static void quicksort(int[] A, int izq, int der) {
-
+	public static void quicksort(int[] A, int izq, int der, int num) {
+		int vuelta=num;
 		  int pivote=A[izq]; // tomamos primer elemento como pivote
 		  int i=izq; // i realiza la búsqueda de izquierda a derecha
 		  int j=der; // j realiza la búsqueda de derecha a izquierda
 		  int aux;
-		 
+		  memoria2[vuelta]=0;
 		  while(i<j){            // mientras no se crucen las búsquedas
 		     while(A[i]<=pivote && i<j) i++; // busca elemento mayor que pivote
 		     while(A[j]>pivote) j--;         // busca elemento menor que pivote
@@ -99,9 +103,11 @@ public class Main {
 		   A[izq]=A[j]; // se coloca el pivote en su lugar de forma que tendremos
 		   A[j]=pivote; // los menores a su izquierda y los mayores a su derecha
 		   if(izq<j-1)
-		      quicksort(A,izq,j-1); // ordenamos subarray izquierdo
+		      quicksort(A,izq,j-1, vuelta); // ordenamos subarray izquierdo
 		   if(j+1 <der)
-		      quicksort(A,j+1,der); // ordenamos subarray derecho
+		      quicksort(A,j+1,der, vuelta); // ordenamos subarray derecho
+		   if(((runtime.totalMemory() - runtime.freeMemory()) / dataSize)>memoria2[vuelta])
+			  memoria2[vuelta]=(runtime.totalMemory() - runtime.freeMemory()) / dataSize;
 		}
 	
 	/**
@@ -111,12 +117,18 @@ public class Main {
 	 * @param izq posicion donde iniciamos la ordenacion
 	 * @param der posicion en la que terminamos
 	 */
-	public static void mergesort(int[] A,int izq, int der){
-	    if (izq<der){
+	public static void mergesort(int[] A,int izq, int der, int num){
+	    int j=num;
+	    memoria1[j]=0;
+	    //(runtime.totalMemory() - runtime.freeMemory()) / dataSize;
+		if (izq<der){
 	            int m=(izq+der)/2;
-	            mergesort(A,izq, m);
-	            mergesort(A,m+1, der);
+	            mergesort(A,izq, m,j);
+	            mergesort(A,m+1, der,j);
 	            merge(A,izq, m, der);
+	            if(((runtime.totalMemory() - runtime.freeMemory()) / dataSize)>memoria1[j]){
+	            memoria1[j]=(runtime.totalMemory() - runtime.freeMemory()) / dataSize;
+	            }
 	    }
 	}
 	/**
@@ -147,17 +159,22 @@ public class Main {
 		                           A[k++]=B[i++]; //primera mitad (si los hay)
 		             }
 		 }
-	
+	static long[] memoria1;
+	static long[] memoria2;
+	static long[] memoria3;
+	static long[] memoria4;
+	static long dataSize = 1024 * 1024;
+	static Runtime runtime = Runtime.getRuntime();
 	public static void main(String[] args) throws IOException {
 		int m=500;//numero de mediciones que hace
-		int n=70000;//tamaño de los arrays
+		int n=5000;//tamaño de los arrays
 		int o=100000;
-		long dataSize = 1024 * 1024;
-		Runtime runtime = Runtime.getRuntime();
-		long[] memoria1 = new long[m];
-		long[] memoria2 = new long[m];
-		long[] memoria3 = new long[m];
-		long[] memoria4 = new long[m];
+		
+		
+		 memoria1 = new long[m];
+		 memoria2 = new long[m];
+		 memoria3 = new long[m];
+		memoria4 = new long[m];
 		long[] Diferencia1 =new long[m];
 		long[] Diferencia2 =new long[m];
 		long[] Diferencia3 =new long[m];
@@ -178,13 +195,13 @@ public class Main {
 		long time_start4, time_end4;
 		time_start = System.nanoTime();
 		
-		mergesort(A, 0, A.length-1);
-		memoria1[j]=(runtime.totalMemory() - runtime.freeMemory()) / dataSize;
+		mergesort(A, 0, A.length-1,j);
+		//memoria1[j]=(runtime.totalMemory() - runtime.freeMemory()) / dataSize;
 		time_end = System.nanoTime();
 		time_start2 = System.nanoTime();
 		
-		quicksort( B, 0, B.length-1);
-		memoria2[j]=(runtime.totalMemory() - runtime.freeMemory()) / dataSize;
+		quicksort( B, 0, B.length-1,j);
+		//memoria2[j]=(runtime.totalMemory() - runtime.freeMemory()) / dataSize;
 		time_end2 = System.nanoTime();
 		//System.out.println("the task has taken "+ ( time_end - time_start ) +" milliseconds");
 		dif1=time_end - time_start;
@@ -195,14 +212,14 @@ public class Main {
 		Diferencia2[j]=dif2;
 		
 		time_start3 = System.nanoTime();
-		int a = busquedaBinaria(A, (int) (Math.random()*o));
-		memoria3[j]=(runtime.totalMemory() - runtime.freeMemory()) / dataSize;
+		int a = busquedaBinaria(A, (int) (Math.random()*o),j);
+		//memoria3[j]=(runtime.totalMemory() - runtime.freeMemory()) / dataSize;
 		time_end3 = System.nanoTime();
 		Diferencia3[j]=time_end3-time_start3;
 		
 		time_start4 = System.nanoTime();
-		int b=busquedaSecuencial(B, (int) (Math.random()*o) );
-		memoria4[j]=(runtime.totalMemory() - runtime.freeMemory()) / dataSize;
+		int b=busquedaSecuencial(B, (int) (Math.random()*o), j );
+		//memoria4[j]=(runtime.totalMemory() - runtime.freeMemory()) / dataSize;
 		time_end4 = System.nanoTime();
 		Diferencia4[j]=time_end4-time_start4;
 		
@@ -212,10 +229,10 @@ public class Main {
 		//System.out.println("the busqueda binaria has taken "+ ( time_end3 - time_start3 ) +" nanoseconds");
 		//System.out.println("the Busqueda secuencial has taken "+ ( time_end4 - time_start4 ) +" nanoseconds");
 		}
-		aniadirArchivo(Diferencia1, "Tiempo_mergesort_"+n);
-		aniadirArchivo(Diferencia2, "Tiempo_quicksort_"+n);
-		aniadirArchivo(Diferencia3, "Tiempo_Busqueda_Binaria_"+n);
-		aniadirArchivo(Diferencia4, "Tiempo_Busqueda_Secuencial_"+n);
+//		aniadirArchivo(Diferencia1, "Tiempo_mergesort_"+n);
+//		aniadirArchivo(Diferencia2, "Tiempo_quicksort_"+n);
+//		aniadirArchivo(Diferencia3, "Tiempo_Busqueda_Binaria_"+n);
+//		aniadirArchivo(Diferencia4, "Tiempo_Busqueda_Secuencial_"+n);
 		aniadirArchivo(memoria1,"Memoria_mergesort_"+n);
 		aniadirArchivo(memoria2,"Memoria_quicksort_"+n);
 		aniadirArchivo(memoria3,"Memoria_Busqueda_Binaria_"+n);
